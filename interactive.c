@@ -3,49 +3,66 @@
 
 #define PROMPT	"TEST> "
 
-static char *readline(const char *prompt)
+static char *getcmd(void)
 {
-	char line[1024];
-
-	fputs(prompt, stdout);
+	// output the promption
+	fputs(PROMPT, stdout);
 	fflush(stdout);
 
+	// get command input
+	char line[256];
 	char *r = fgets(line, sizeof(line), stdin);
 	if (!r)
 		return NULL;
 
-	//TODO: trim space and '\n'
-	int len = strlen(r);
-	if (len > 0 && r[len - 1] == '\n')
-		r[len - 1] = '\0';
+	// trim tailling newline
+	if (r[strlen(r) - 1] == '\n')
+		r[strlen(r) - 1] = 0;
 
 	return strdup(r);
 }
 
-static int command_parse(const char *cmdstr)
+static void usage()
 {
-	//TODO: comand line parsing
-	printf("%s: do something...\n", cmdstr);
+	fprintf(stderr,
+		"Usage: ./a.out\n"
+		"A simple interactive command line interface\n"
+		"\n"
+		"COMMAND:\n"
+		"  ? | help	This help message.\n"
+		"  quit | exit	Say byebye.\n"
+	       );
+}
 
-	if (!strcasecmp(cmdstr, "quit") || !strcasecmp(cmdstr, "exit")) {
-		printf("Bye!\n");
-		return 1;
+static void run_command(const char *cmd)
+{
+	printf("Run command [%s] with\n", cmd);
+
+	int i = 1;
+	char *arg = strtok(NULL, "\t ");
+	while (arg) {
+		printf("ARG#%d = [%s]\n", i, arg);
+		arg = strtok(NULL, "\t ");
+		i++;
 	}
-
-	return 0;
 }
 
 int main()
 {
-	char *cmd;
-
 	while (1) {
-		cmd = readline(PROMPT);
-		if (!cmd)
-			break;
+		char *cmdstr = getcmd();
+		char *cmd = strtok(cmdstr, "\t ");
+		if (!cmd || cmd[0] == '?' || !strcasecmp(cmd, "help")) {
+			usage();
+			continue;
+		}
 
-		if (command_parse(cmd))
+		if (!strcasecmp(cmd, "quit") || !strcasecmp(cmd, "exit")) {
+			printf("Bye!\n");
 			break;
+		}
+
+		run_command(cmd);
 	}
 
 	return 0;
