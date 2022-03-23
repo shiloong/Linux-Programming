@@ -11,3 +11,4 @@ Help to keep the Linux programming sence
 5. A simple Linux tarball package， likes hello world；
 6. A simple Linux rpm/apt package.
 7. C unit test framework, Function test with release.
+8. Some generic libraries, such as list, sort, etc.
